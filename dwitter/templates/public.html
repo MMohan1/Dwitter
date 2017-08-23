@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="panel right">
+        <h1>Create a Dwite</h1>
+        <p>
+            <form action="/submit" method="post">
+            {% for field in dwiter_form %}{% csrf_token %}
+            {{ field }}
+            {% endfor %}
+            <input type="hidden" value="{{ next_url }}" name="next_url">
+            <input type="submit" value="Dwitte!">
+            </form>
+        </p>
+    </div>
+    <div class="panel left">
+        <h1>Public Dwites</h1>
+        {% for dwite in dwiters %}
+        <div class="dwitteWrapper">
+            <img class="avatar" src="{{ dwite.user.profile.gravatar_url }}">
+            <span class="name">{{ dwite.user.first_name }}</span>@{{ dwite.user.username }}
+            <span class="time">{{ dwite.creation_date|timesince }}</span>
+            <p>{{ dwite.content }}</p>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
