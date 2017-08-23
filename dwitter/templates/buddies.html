@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block login %}
+    {% with user.username as username %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+ 
+{% block content %}
+    <div class="panel right">
+        <h1>Create a Dwitter</h1>
+        <p>
+            <form action="/submit" method="post">
+            {% for field in dwitter_form %}{% csrf_token %}
+            {{ field }}
+            {% endfor %}
+            <input type="hidden" value="{{ next_url }}" name="next_url">
+            <input type="submit" value="Ribbit!">
+            </form>
+        </p>
+    </div>
+    <div class="panel left">
+        <h1>Buddies' Dwitters</h1>
+        {% for dwitter in dwitters %}
+        <div class="dwitterWrapper">
+            <a href="/users/{{ dwitter.user.username }}">
+                <img class="avatar" src="{{ dwitter.user.profile.gravatar_url }}">
+                <span class="name">{{ dwitter.user.first_name }}</span>
+            </a>
+            @{{ dwitter.user.username }}
+            <p>
+                {{ dwitter.content }}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
