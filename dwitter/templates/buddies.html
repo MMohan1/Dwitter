@@ -7,7 +7,7 @@
  
 {% block content %}
     <div class="panel right">
-        <h1>Create a Dwitter</h1>
+        <h1>Create a Dwiter</h1>
         <p>
             <form action="/submit" method="post">
             {% for field in dwitter_form %}{% csrf_token %}
@@ -19,7 +19,7 @@
         </p>
     </div>
     <div class="panel left">
-        <h1>Buddies' Dwitters</h1>
+        <h1>Buddies' Dwiters</h1>
         {% for dwitter in dwitters %}
         <div class="dwitterWrapper">
             <a href="/users/{{ dwitter.user.username }}">

@@ -21,8 +21,10 @@ from dwitter_app import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$',views.index),
-    url(r'^login$',views.login_view),
-    url(r'^logout$',views.logout_view),
-    url(r'^signup$',views.signup)
+    url(r'^$', views.index),  # root
+    url(r'^login$', views.login_view),  # login
+    url(r'^logout$', views.logout_view),  # logout
+    url(r'^signup$', views.signup),  # signup
+    url(r'^dwiters$', views.public),  # public dwitter
+    url(r'^submit$', views.submit)  # submit new dwitter
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

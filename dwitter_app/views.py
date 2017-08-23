@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from dwitter_app.forms import AuthenticateForm, UserCreateForm, DwitterForm
 from dwitter_app.models import Dwitter
 from django.conf import settings
@@ -16,20 +17,20 @@ def index(request, auth_form=None, user_form=None):
         dwitters_self = Dwitter.objects.filter(user=user.id)
         dwitters_buddies = Dwitter.objects.filter(user__userprofile__in=user.profile.follows.all())
         dwitters = dwitters_self | dwitters_buddies
- 
+
         return render(request,
                       'buddies.html',
                       {'dwitter_form': dwitter_form, 'user': user,
                        'ribbits': dwitters,
-                       'next_url': '/', "STATIC_URL":settings.STATIC_URL})
+                       'next_url': '/', "STATIC_URL": settings.STATIC_URL})
     else:
         # User is not logged in
         auth_form = auth_form or AuthenticateForm()
         user_form = user_form or UserCreateForm()
- 
+
         return render(request,
                       'home.html',
-                      {'auth_form': auth_form, 'user_form': user_form, "STATIC_URL":settings.STATIC_URL})
+                      {'auth_form': auth_form, 'user_form': user_form, "STATIC_URL": settings.STATIC_URL})
 
 
 def login_view(request):
@@ -43,8 +44,8 @@ def login_view(request):
             # Failure
             return index(request, auth_form=form)
     return redirect('/')
- 
- 
+
+
 def logout_view(request):
     logout(request)
     return redirect('/')
@@ -64,4 +65,29 @@ def signup(request):
             return redirect('/')
         else:
             return index(request, user_form=user_form)
+    return redirect('/')
+
+
+@login_required
+def public(request, dwitter_form=None):
+    dwiter_form = dwitter_form or DwitterForm()
+    dwiters = Dwitter.objects.reverse()[:10]
+    return render(request,
+                  'public.html',
+                  {'dwiter_form': dwiter_form, 'next_url': '/dwiters',
+                   'dwiters': dwiters, 'username': request.user.username, "STATIC_URL": settings.STATIC_URL})
+
+
+@login_required
+def submit(request):
+    if request.method == "POST":
+        dwitter_form = DwitterForm(data=request.POST)
+        next_url = request.POST.get("next_url", "/")
+        if dwitter_form.is_valid():
+            dwitter = dwitter_form.save(commit=False)
+            dwitter.user = request.user
+            dwitter.save()
+            return redirect(next_url)
+        else:
+            return public(request, dwitter_form)
     return redirect('/')
