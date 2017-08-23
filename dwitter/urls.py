@@ -26,5 +26,8 @@ urlpatterns = [
     url(r'^logout$', views.logout_view),  # logout
     url(r'^signup$', views.signup),  # signup
     url(r'^dwiters$', views.public),  # public dwitter
-    url(r'^submit$', views.submit)  # submit new dwitter
+    url(r'^submit$', views.submit),  # submit new dwitter
+    url(r'^users/$', views.users),  # view user list
+    url(r'^users/(?P<username>\w{0,30})/$', views.users),  # Perticuler user view
+    url(r'^follow$', views.follow),  # follow user
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

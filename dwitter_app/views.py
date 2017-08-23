@@ -7,6 +7,9 @@ from django.contrib.auth.decorators import login_required
 from dwitter_app.forms import AuthenticateForm, UserCreateForm, DwitterForm
 from dwitter_app.models import Dwitter
 from django.conf import settings
+from django.db.models import Count
+from django.http import Http404
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def index(request, auth_form=None, user_form=None):
@@ -21,7 +24,7 @@ def index(request, auth_form=None, user_form=None):
         return render(request,
                       'buddies.html',
                       {'dwitter_form': dwitter_form, 'user': user,
-                       'ribbits': dwitters,
+                       'dwitters': dwitters,
                        'next_url': '/', "STATIC_URL": settings.STATIC_URL})
     else:
         # User is not logged in
@@ -91,3 +94,47 @@ def submit(request):
         else:
             return public(request, dwitter_form)
     return redirect('/')
+
+
+def get_latest(user):
+    try:
+        return user.dwitter_set.order_by('-id')[0]
+    except IndexError:
+        return ""
+
+
+@login_required
+def users(request, username="", dwitter_form=None):
+    if username:
+        # Show a profile
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise Http404
+        dwiters = Dwitter.objects.filter(user=user.id)
+        if username == request.user.username or request.user.profile.follows.filter(user__username=username):
+            # Self Profile or buddies' profile
+            return render(request, 'user.html', {'user': user, 'dwiters': dwiters, "STATIC_URL": settings.STATIC_URL})
+        return render(request, 'user.html', {'user': user, 'dwiters': dwiters, 'follow': True, "STATIC_URL": settings.STATIC_URL})
+    users = User.objects.all().annotate(dwiters_count=Count('dwitter'))
+    dwites = map(get_latest, users)
+    obj = zip(users, dwites)
+    dwitter_form = dwitter_form or DwitterForm()
+    return render(request,
+                  'profiles.html',
+                  {'obj': obj, 'next_url': '/users/',
+                   'dwitter_form': dwitter_form,
+                   'username': request.user.username, "STATIC_URL": settings.STATIC_URL})
+
+
+@login_required
+def follow(request):
+    if request.method == "POST":
+        follow_id = request.POST.get('follow', False)
+        if follow_id:
+            try:
+                user = User.objects.get(id=follow_id)
+                request.user.profile.follows.add(user.profile)
+            except ObjectDoesNotExist:
+                return redirect('/users/')
+    return redirect('/users/')
