@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="panel right">
-        <h1>Create a Dwite</h1>
+        <h1>Create a Dwitte</h1>
         <p>
             <form action="/submit" method="post">
             {% for field in dwiter_form %}{% csrf_token %}
@@ -14,7 +14,7 @@
         </p>
     </div>
     <div class="panel left">
-        <h1>Public Dwites</h1>
+        <h1>Public Dwittes</h1>
         {% for dwite in dwiters %}
         <div class="dwitteWrapper">
             <img class="avatar" src="{{ dwite.user.profile.gravatar_url }}">
