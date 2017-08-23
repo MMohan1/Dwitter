@@ -21,7 +21,7 @@ def index(request, auth_form=None, user_form=None):
                       'buddies.html',
                       {'dwitter_form': dwitter_form, 'user': user,
                        'ribbits': dwitters,
-                       'next_url': '/', })
+                       'next_url': '/', "STATIC_URL":settings.STATIC_URL})
     else:
         # User is not logged in
         auth_form = auth_form or AuthenticateForm()
