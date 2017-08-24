@@ -23,4 +23,6 @@ class UserProfile(models.Model):
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 
 
-
+class DwitterLike(models.Model):
+    dwitte = models.ForeignKey(Dwitter)
+    likes = models.ManyToManyField(User)

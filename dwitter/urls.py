@@ -30,4 +30,5 @@ urlpatterns = [
     url(r'^users/$', views.users),  # view user list
     url(r'^users/(?P<username>\w{0,30})/$', views.users),  # Perticuler user view
     url(r'^follow$', views.follow),  # follow user
+    url(r'^like$', views.like),  # like the dwitte
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

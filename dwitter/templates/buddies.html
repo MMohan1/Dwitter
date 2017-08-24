@@ -30,6 +30,17 @@
             <p>
                 {{ dwitter.content }}
             </p>
+            <p>
+              <span>{{ dwitter.dwitterlike_set.all.count}} Liked</span>
+              <span class="spacing">
+                <form action="/like" method="post">
+                  {% csrf_token %}
+                  <input type="hidden" value="{{ dwitter.user.id }}" name="user_id">
+                  <input type="hidden" value="{{ dwitter.id }}" name="dwitter_id">
+                  <input type="submit" value="Like">
+                </form>
+              </span>
+              </p>
         </div>
         {% endfor %}
     </div>

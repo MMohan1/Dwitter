@@ -5,7 +5,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from dwitter_app.forms import AuthenticateForm, UserCreateForm, DwitterForm
-from dwitter_app.models import Dwitter
+from dwitter_app.models import Dwitter, DwitterLike
 from django.conf import settings
 from django.db.models import Count
 from django.http import Http404
@@ -20,7 +20,6 @@ def index(request, auth_form=None, user_form=None):
         dwitters_self = Dwitter.objects.filter(user=user.id)
         dwitters_buddies = Dwitter.objects.filter(user__userprofile__in=user.profile.follows.all())
         dwitters = dwitters_self | dwitters_buddies
-
         return render(request,
                       'buddies.html',
                       {'dwitter_form': dwitter_form, 'user': user,
@@ -138,3 +137,18 @@ def follow(request):
             except ObjectDoesNotExist:
                 return redirect('/users/')
     return redirect('/users/')
+
+
+@login_required
+def like(request):
+    if request.method == "POST":
+        dwitter_id = request.POST.get('dwitter_id', False)
+        if dwitter_id:
+            try:
+                dwitter = Dwitter.objects.get(id=dwitter_id)
+                dl = DwitterLike(dwitte=dwitter)
+                dl.save()
+                dl.likes.add(request.user)
+            except ObjectDoesNotExist:
+                return redirect('/')
+    return redirect('/')
