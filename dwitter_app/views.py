@@ -17,13 +17,19 @@ def index(request, auth_form=None, user_form=None):
     if request.user.is_authenticated():
         dwitter_form = DwitterForm()
         user = request.user
-        dwitters_self = Dwitter.objects.filter(user=user.id)
-        dwitters_buddies = Dwitter.objects.filter(user__userprofile__in=user.profile.follows.all())
+        query_string = request.GET.get("q")
+        if query_string:
+            dwitters_self = Dwitter.objects.filter(user=user.id, content__icontains=query_string)
+            dwitters_buddies = Dwitter.objects.filter(user__userprofile__in=user.profile.follows.all(), content__icontains=query_string)
+        else:
+            dwitters_self = Dwitter.objects.filter(user=user.id)
+            dwitters_buddies = Dwitter.objects.filter(user__userprofile__in=user.profile.follows.all())
         dwitters = dwitters_self | dwitters_buddies
         return render(request,
                       'buddies.html',
                       {'dwitter_form': dwitter_form, 'user': user,
                        'dwitters': dwitters,
+                       "query_string": query_string,
                        'next_url': '/', "STATIC_URL": settings.STATIC_URL})
     else:
         # User is not logged in
