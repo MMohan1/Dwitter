@@ -26,3 +26,11 @@ User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 class DwitterLike(models.Model):
     dwitte = models.ForeignKey(Dwitter)
     likes = models.ManyToManyField(User)
+    creation_date = models.DateTimeField(auto_now=True, blank=True)
+
+
+class DwitterComment(models.Model):
+    dwitte = models.ForeignKey(Dwitter)
+    comments = models.ManyToManyField(User)
+    content = models.TextField(max_length=140)
+    creation_date = models.DateTimeField(auto_now=True, blank=True)

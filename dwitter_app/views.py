@@ -18,6 +18,10 @@ def index(request, auth_form=None, user_form=None):
         dwitter_form = DwitterForm()
         user = request.user
         query_string = request.GET.get("q")
+        if not query_string:
+            query_string = request.POST.get("query")
+            if query_string == "None":
+                query_string = None
         if query_string:
             dwitters_self = Dwitter.objects.filter(user=user.id, content__icontains=query_string)
             dwitters_buddies = Dwitter.objects.filter(user__userprofile__in=user.profile.follows.all(), content__icontains=query_string)
@@ -152,6 +156,22 @@ def follow(request):
 
 @login_required
 def like(request):
+    if request.method == "POST":
+        dwitter_id = request.POST.get('dwitter_id', False)
+        if dwitter_id:
+            try:
+                dwitter = Dwitter.objects.get(id=dwitter_id)
+                dl = DwitterLike(dwitte=dwitter)
+                dl.save()
+                dl.likes.add(request.user)
+            except ObjectDoesNotExist:
+                return redirect('/')
+    return index(request)
+
+
+@login_required
+def comment(request):
+    import pdb;pdb.set_trace()
     if request.method == "POST":
         dwitter_id = request.POST.get('dwitter_id', False)
         if dwitter_id:
