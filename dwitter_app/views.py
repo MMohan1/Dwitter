@@ -115,7 +115,11 @@ def users(request, username="", dwitter_form=None):
             # Self Profile or buddies' profile
             return render(request, 'user.html', {'user': user, 'dwiters': dwiters, "STATIC_URL": settings.STATIC_URL})
         return render(request, 'user.html', {'user': user, 'dwiters': dwiters, 'follow': True, "STATIC_URL": settings.STATIC_URL})
-    users = User.objects.all().annotate(dwiters_count=Count('dwitter'))
+    query_string = request.GET.get("q")
+    if query_string:
+        users = User.objects.filter(username__icontains=query_string).annotate(dwiters_count=Count('dwitter'))
+    else:
+        users = User.objects.all().annotate(dwiters_count=Count('dwitter'))
     dwites = map(get_latest, users)
     obj = zip(users, dwites)
     dwitter_form = dwitter_form or DwitterForm()
@@ -123,6 +127,7 @@ def users(request, username="", dwitter_form=None):
                   'profiles.html',
                   {'obj': obj, 'next_url': '/users/',
                    'dwitter_form': dwitter_form,
+                   "query_string": query_string,
                    'username': request.user.username, "STATIC_URL": settings.STATIC_URL})
 
 

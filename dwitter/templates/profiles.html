@@ -14,7 +14,11 @@
         </p>
     </div>
     <div class="panel left">
-        <h1>Public Profiles</h1>
+      <h1>Public Profiles</h1>
+      <form method="get" action="/users/" class="navbar-form pull-right">
+        <input type="text" id="searchBox" class="input-medium search-query" value={{query_string}} name="q" placeholder="Search">
+        <input type="submit" class="btn" value="Search" >
+      </form>
         {% for user, Dwite in obj %}
         <div class="dwitterWrapper">
             <a href="/users/{{ user.username }}">
