@@ -12,8 +12,8 @@
             {% block login %}
             <a href="/">Home</a> &nbsp;&nbsp;&nbsp;&nbsp;
             <a href="/users/">Public Profiles</a> &nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="/users/{{ username }}">My Profile</a> &nbsp;&nbsp;&nbsp;&nbsp;
             <a href="/dwiters">Public Dwittes</a> &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="/users/{{ username }}">{{ username }}'s Profile</a> &nbsp;&nbsp;&nbsp;&nbsp;
             <form action="/logout">
                 <input type="submit" id="btnLogOut" value="Log Out">
             </form>
