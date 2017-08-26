@@ -35,11 +35,31 @@
                 <span class="name">{{ dwitter.user.first_name }}</span>
             </a>
             @{{ dwitter.user.username }}
+            <b>
+              {{ dwitter.creation_date|timesince }}
+              </b>
             <p>
                 {{ dwitter.content }}
             </p>
+            {% if dwitter.dwittercomment_set.all.count %}
+            <h1><b>Comments</b></h1>
+            </br>
+            {% endif%}
             <p>
-                <form action="/comment" method="post">
+              {% for dwitter in dwitter.dwittercomment_set.all %}
+              {{ dwitter.comment_by.first.first_name }}@ - {{ dwitter.comment }}  
+              &nbsp;
+              &nbsp;
+              &nbsp;
+              &nbsp;
+              &nbsp;
+              &nbsp;
+              {{ dwitter.creation_date|timesince }}
+              <br>
+              {% endfor %}
+              </p>
+            <p>
+              <form action="/comment" method="post">
                   {% for field in dwitter_form %}{% csrf_token %}
                   {{ field }}
                   {% endfor %}
@@ -54,7 +74,17 @@
                   <input type="hidden" value="{{ dwitter.user.id }}" name="user_id">
                   <input type="hidden" value="{{ dwitter.id }}" name="dwitter_id">
                   <input type="hidden" value="{{ query_string }}" name="query">
-                  <p><span>{{ dwitter.dwitterlike_set.all.count}} Liked</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" value="Like"></p>
+                  <p><span>{{ dwitter.dwittercomment_set.all.count}} Comments</span>
+                    &nbsp;
+                    &nbsp;
+                    &nbsp;
+                    &nbsp;
+                    <span>{{ dwitter.dwitterlike_set.all.count}} Liked</span>
+                    &nbsp;
+                    &nbsp;
+                    &nbsp;
+                    &nbsp;
+                    <input type="submit" value="Like"></p>
                 </form>
               </span>
               </p>

@@ -31,6 +31,6 @@ class DwitterLike(models.Model):
 
 class DwitterComment(models.Model):
     dwitte = models.ForeignKey(Dwitter)
-    comments = models.ManyToManyField(User)
-    content = models.TextField(max_length=140)
+    comment_by = models.ManyToManyField(User)
+    comment = models.TextField()
     creation_date = models.DateTimeField(auto_now=True, blank=True)

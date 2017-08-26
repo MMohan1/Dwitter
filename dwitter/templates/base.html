@@ -10,10 +10,10 @@
         <div class="wrapper">
             <span>Twitter Clone</span>
             {% block login %}
-            <a href="/">Home</a>
-            <a href="/users/">Public Profiles</a>
-            <a href="/users/{{ username }}">My Profile</a>
-            <a href="/dwiters">Public Dwittes</a>
+            <a href="/">Home</a> &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="/users/">Public Profiles</a> &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="/users/{{ username }}">My Profile</a> &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="/dwiters">Public Dwittes</a> &nbsp;&nbsp;&nbsp;&nbsp;
             <form action="/logout">
                 <input type="submit" id="btnLogOut" value="Log Out">
             </form>
@@ -22,12 +22,17 @@
     </header>
     <div id="content">
         <div class="wrapper">
-            {% block flash %}
-            {% if auth_form.non_field_errors or user_form.non_field_errors or ribbit_form.errors %}
+          {% block flash %}
+            {% if auth_form.non_field_errors or user_form.errors or dwitter_form.content.errors %}
             <div class="flash error">
                 {{ auth_form.non_field_errors }}
-                {{ user_form.non_field_errors }}
-                {{ ribbit_form.content.errors }}
+                {{ user_form.email.errors }}
+                {{ user_form.username.errors }}
+                {{ user_form.first_name.errors }}
+                {{ user_form.last_name.errors }}
+                {{ user_form.password1.errors }}
+                {{ user_form.password2.errors }}
+                {{ dwitter_form.content.errors }}
             </div>
             {% endif %}
             {% if notice %}

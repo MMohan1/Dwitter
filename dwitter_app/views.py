@@ -5,17 +5,17 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from dwitter_app.forms import AuthenticateForm, UserCreateForm, DwitterForm
-from dwitter_app.models import Dwitter, DwitterLike
+from dwitter_app.models import Dwitter, DwitterLike, DwitterComment
 from django.conf import settings
 from django.db.models import Count
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 
 
-def index(request, auth_form=None, user_form=None):
+def index(request, auth_form=None, user_form=None, dwitter_form=None):
     # User is logged in
     if request.user.is_authenticated():
-        dwitter_form = DwitterForm()
+        dwitter_form = dwitter_form or DwitterForm()
         user = request.user
         query_string = request.GET.get("q")
         if not query_string:
@@ -32,14 +32,13 @@ def index(request, auth_form=None, user_form=None):
         return render(request,
                       'buddies.html',
                       {'dwitter_form': dwitter_form, 'user': user,
-                       'dwitters': dwitters,
+                       'dwitters': dwitters[::-1],
                        "query_string": query_string,
                        'next_url': '/', "STATIC_URL": settings.STATIC_URL})
     else:
         # User is not logged in
         auth_form = auth_form or AuthenticateForm()
         user_form = user_form or UserCreateForm()
-
         return render(request,
                       'home.html',
                       {'auth_form': auth_form, 'user_form': user_form, "STATIC_URL": settings.STATIC_URL})
@@ -82,11 +81,11 @@ def signup(request):
 
 @login_required
 def public(request, dwitter_form=None):
-    dwiter_form = dwitter_form or DwitterForm()
-    dwiters = Dwitter.objects.reverse()[:10]
+    dwitter_form = dwitter_form or DwitterForm()
+    dwiters = Dwitter.objects.all()[::-1]
     return render(request,
                   'public.html',
-                  {'dwiter_form': dwiter_form, 'next_url': '/dwiters',
+                  {'dwitter_form': dwitter_form, 'next_url': '/dwiters',
                    'dwiters': dwiters, 'username': request.user.username, "STATIC_URL": settings.STATIC_URL})
 
 
@@ -101,7 +100,7 @@ def submit(request):
             dwitter.save()
             return redirect(next_url)
         else:
-            return public(request, dwitter_form)
+            return index(request, dwitter_form=dwitter_form)
     return redirect('/')
 
 
@@ -171,15 +170,16 @@ def like(request):
 
 @login_required
 def comment(request):
-    import pdb;pdb.set_trace()
     if request.method == "POST":
         dwitter_id = request.POST.get('dwitter_id', False)
+        comment = request.POST.get('content', False)
         if dwitter_id:
             try:
                 dwitter = Dwitter.objects.get(id=dwitter_id)
-                dl = DwitterLike(dwitte=dwitter)
+                dl = DwitterComment(dwitte=dwitter)
+                dl.comment = comment
                 dl.save()
-                dl.likes.add(request.user)
+                dl.comment_by.add(request.user)
             except ObjectDoesNotExist:
                 return redirect('/')
-    return redirect('/')
+    return index(request)
