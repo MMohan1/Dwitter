@@ -13,6 +13,9 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 def index(request, auth_form=None, user_form=None, dwitter_form=None):
+    """
+    view is used to get the home page for app
+    """
     # User is logged in
     if request.user.is_authenticated():
         dwitter_form = dwitter_form or DwitterForm()
@@ -24,7 +27,8 @@ def index(request, auth_form=None, user_form=None, dwitter_form=None):
                 query_string = None
         if query_string:
             dwitters_self = Dwitter.objects.filter(user=user.id, content__icontains=query_string)
-            dwitters_buddies = Dwitter.objects.filter(user__userprofile__in=user.profile.follows.all(), content__icontains=query_string)
+            dwitters_buddies = Dwitter.objects.filter(
+                user__userprofile__in=user.profile.follows.all(), content__icontains=query_string)
         else:
             dwitters_self = Dwitter.objects.filter(user=user.id)
             dwitters_buddies = Dwitter.objects.filter(user__userprofile__in=user.profile.follows.all())
@@ -58,11 +62,17 @@ def login_view(request):
 
 
 def logout_view(request):
+    """
+    logout
+    """
     logout(request)
     return redirect('/')
 
 
 def signup(request):
+    """
+    signup view
+    """
     user_form = UserCreateForm(data=request.POST)
     if request.method == 'POST':
         if user_form.is_valid():
@@ -81,6 +91,9 @@ def signup(request):
 
 @login_required
 def public(request, dwitter_form=None):
+    """
+    view is used to get the public dwitte
+    """
     dwitter_form = dwitter_form or DwitterForm()
     dwiters = Dwitter.objects.all()[::-1]
     return render(request,
@@ -91,6 +104,9 @@ def public(request, dwitter_form=None):
 
 @login_required
 def submit(request):
+    """
+    view is used to save the user dwitte
+    """
     if request.method == "POST":
         dwitter_form = DwitterForm(data=request.POST)
         next_url = request.POST.get("next_url", "/")
@@ -105,6 +121,9 @@ def submit(request):
 
 
 def get_latest(user):
+    """
+    for a user get the lattest twitte details
+    """
     try:
         return user.dwitter_set.order_by('-id')[0]
     except IndexError:
@@ -113,6 +132,9 @@ def get_latest(user):
 
 @login_required
 def users(request, username="", dwitter_form=None):
+    """
+    view is used to get all user details and a spacific user details
+    """
     if username:
         # Show a profile
         try:
@@ -142,6 +164,9 @@ def users(request, username="", dwitter_form=None):
 
 @login_required
 def follow(request):
+    """
+    view is used to save the follwers details in in DB
+    """
     if request.method == "POST":
         follow_id = request.POST.get('follow', False)
         if follow_id:
@@ -155,6 +180,9 @@ def follow(request):
 
 @login_required
 def like(request):
+    """
+    view is used to save the user likes with repactive to a dwitte
+    """
     if request.method == "POST":
         dwitter_id = request.POST.get('dwitter_id', False)
         if dwitter_id:
@@ -170,6 +198,9 @@ def like(request):
 
 @login_required
 def comment(request):
+    """
+    view is used to save the user comment with repactive to a dwitte
+    """
     if request.method == "POST":
         dwitter_id = request.POST.get('dwitter_id', False)
         comment = request.POST.get('content', False)
