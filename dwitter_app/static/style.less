@@ -151,6 +151,14 @@ header {
 			&.left {
 				width: @content-width - 327;
 				float: left;
+                textarea.dwitterText {
+					width: 449px;
+					height: 120px;
+					border: 1px solid @border-color;
+                    &.error {
+                        border: 1px solid #4C1717;
+                    }
+				}
 				div.dwitterWrapper {
 					padding: 15px 0;
 					border-bottom: 1px solid @border-color;

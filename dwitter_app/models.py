@@ -7,7 +7,7 @@ import hashlib
  
  
 class Dwitter(models.Model):
-    content = models.CharField(max_length=140)
+    content = models.CharField(max_length=140, unique=True)
     user = models.ForeignKey(User)
     creation_date = models.DateTimeField(auto_now=True, blank=True)
  
@@ -26,3 +26,11 @@ User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 class DwitterLike(models.Model):
     dwitte = models.ForeignKey(Dwitter)
     likes = models.ManyToManyField(User)
+    creation_date = models.DateTimeField(auto_now=True, blank=True)
+
+
+class DwitterComment(models.Model):
+    dwitte = models.ForeignKey(Dwitter)
+    comment_by = models.ManyToManyField(User)
+    comment = models.TextField()
+    creation_date = models.DateTimeField(auto_now=True, blank=True)

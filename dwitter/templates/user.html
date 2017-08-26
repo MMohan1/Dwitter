@@ -40,6 +40,10 @@
             @{{ dwite.user.username }}
             <span class="time">{{ dwite.creation_date|timesince }}</span>
             <p>{{ dwite.content }}</p>
+            <p><span>{{ dwite.dwittercomment_set.all.count}} Comments</span>
+              &nbsp; &nbsp;&nbsp; &nbsp;
+              <span>{{ dwite.dwitterlike_set.all.count}} Liked</span>
+              
         </div>
         {% endfor %}
     </div>
