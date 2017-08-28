@@ -188,9 +188,14 @@ def like(request):
         if dwitter_id:
             try:
                 dwitter = Dwitter.objects.get(id=dwitter_id)
-                dl = DwitterLike(dwitte=dwitter)
-                dl.save()
-                dl.likes.add(request.user)
+                if request.user.id not in dwitter.dwitterlike_set.all().values_list("likes", flat=True):
+                    dl = DwitterLike(dwitte=dwitter)
+                    dl.save()
+                    dl.likes.add(request.user)
+                else:
+                    dwitter_form = DwitterForm()
+                    dwitter_form.errors["content"] = "Hey " + request.user.first_name + "You are all ready liked this dwitte"
+                    return index(request, dwitter_form=dwitter_form)
             except ObjectDoesNotExist:
                 return redirect('/')
     return index(request)
