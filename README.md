@@ -3,7 +3,7 @@
 
 ## Project Setup
 ```
-run the below cammand
+run the below Command
 local-build.sh
 
 ```
