@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+"""
+Please install the "pip install deployer" to excute the deploy script
+http://python-deploy-framework.readthedocs.io/en/latest/pages/django-deployment.html
+"""
+
 from deployer.utils import esc1
 from deployer.host import SSHHost
 from deployer.client import start
