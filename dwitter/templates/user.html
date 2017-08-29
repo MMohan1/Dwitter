@@ -7,7 +7,7 @@
 
 {% block content %}
     <div class="userpanel right">
-      <h1><b>Followers</b></h1>
+      <h1><b>Followers ({{user.profile.followed_by.count}})</b></h1>
       {% for user in user.profile.followed_by.all %}
       {{user.first.username}}
         <div class="dwitterWrapper">
@@ -24,7 +24,7 @@
             <p>{{ Dwite.content }}</p>
         </div>
         {% endfor %}
-      <h1><b>Following</b></h1>
+      <h1><b>Following ({{user.profile.follows.count}})</b></h1>
         {% for user in user.profile.follows.all %}
       {{user.first.username}}
         <div class="dwitterWrapper">
