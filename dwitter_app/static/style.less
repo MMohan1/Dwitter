@@ -128,6 +128,42 @@ header {
 			border-radius: 6px;
 			float: left;
 		}
+
+        div.userpanel {
+        border: 1px solid @border-color;
+			background: white;
+			margin: 0;
+			margin-bottom: 29px;
+			border-radius: 6px;
+			font-size: 14px;
+			&.right {
+				width: 303px;
+                float: right;
+				textarea.dwitterText {
+					width: 249px;
+					height: 160px;
+					border: 1px solid @border-color;
+                    &.error {
+                        border: 1px solid #4C1717;
+                    }
+				}
+			}
+			form {
+				padding: 0 23px;
+			}
+            h1 {
+				border-bottom: 1px solid @border-color;
+				margin: 5px 0;
+				font-weight: normal;
+				font-size: 18px;
+				padding: 13px 23px;
+				height: 23px;
+			}
+			p {
+				padding: 0 24px;
+				margin: 18px 0;
+			}
+        }
 		div.panel {
 			border: 1px solid @border-color;
 			background: white;

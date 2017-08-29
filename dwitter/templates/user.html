@@ -6,6 +6,43 @@
 {% endblock %}
 
 {% block content %}
+    <div class="userpanel right">
+      <h1><b>Followers</b></h1>
+      {% for user in user.profile.followed_by.all %}
+      {{user.first.username}}
+        <div class="dwitterWrapper">
+            <a href="/users/{{ user.user.username }}">
+                <img class="avatar" src="{{ user.user.profile.gravatar_url }}">
+                <span class="name">{{ user.user.first_name }}</span>
+            </a>
+            @{{ user.user.username }}
+            <p>
+                {{ user.user.dwitter_set.count}} Dwittes
+                <span class="spacing">{{ user.user.profile.followed_by.count }} Followers</span>
+                <span class="spacing">{{ user.user.profile.follows.count }} Following</span>
+            </p>
+            <p>{{ Dwite.content }}</p>
+        </div>
+        {% endfor %}
+      <h1><b>Following</b></h1>
+        {% for user in user.profile.follows.all %}
+      {{user.first.username}}
+        <div class="dwitterWrapper">
+            <a href="/users/{{ user.user.username }}">
+                <img class="avatar" src="{{ user.user.profile.gravatar_url }}">
+                <span class="name">{{ user.user.first_name }}</span>
+            </a>
+            @{{ user.user.username }}
+            <p>
+                {{ user.user.dwitter_set.count}} Dwittes
+                <span class="spacing">{{ user.user.profile.followed_by.count }} Followers</span>
+                <span class="spacing">{{ user.user.profile.follows.count }} Following</span>
+            </p>
+            <p>{{ Dwite.content }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
     <div class="panel left">
         <h1>{{ user.first_name }}'s Profile</h1>
         <div class="dwitterWrapper">
