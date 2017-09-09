@@ -19,17 +19,14 @@ class UserProfile(models.Model):
     def gravatar_url(self):
         return "http://www.gravatar.com/avatar/%s?s=50" % hashlib.md5(self.user.email).hexdigest()
 
-User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 
+User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 
 
 class Follow(models.Model):
     follower = models.ForeignKey(User, related_name='follower')
     following = models.ForeignKey(User, related_name='following')
     follow_date = models.DateTimeField(auto_now=True)
-
-
-#User.follow = property(lambda u: Follow.objects.filter(user=u))
 
 
 class Likes(models.Model):

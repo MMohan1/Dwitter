@@ -197,7 +197,8 @@ def like(request):
                 return redirect('/')
             except IntegrityError:
                 dwitter_form = DwitterForm()
-                dwitter_form.errors["content"] = "Hey " + request.user.first_name + "You are all ready liked this dwitte"
+                dwitter_form.errors["content"] = "Hey " + \
+                    request.user.first_name + "You are all ready liked this dwitte"
                 return index(request, dwitter_form=dwitter_form)
     return index(request)
 
