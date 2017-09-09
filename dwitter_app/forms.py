@@ -2,7 +2,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
 from django.utils.html import strip_tags
-from dwitter_app.models import Dwitter
+from dwitter_app.models import Dweet
 
 
 class UserCreateForm(UserCreationForm):
@@ -53,5 +53,5 @@ class DwitterForm(forms.ModelForm):
         return form
  
     class Meta:
-        model = Dwitter
+        model = Dweet
         exclude = ('user',)
