@@ -7,17 +7,20 @@ import hashlib
 
 
 class Dweet(models.Model):
-    content = models.CharField(max_length=140, unique=True)
+    content = models.CharField(max_length=140)
     user = models.ForeignKey(User)
     creation_date = models.DateTimeField(auto_now=True, blank=True)
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User)
+    user = models.ForeignKey(User)
     # follows = models.ManyToManyField('self', related_name='followed_by', symmetrical=False)
 
     def gravatar_url(self):
         return "http://www.gravatar.com/avatar/%s?s=50" % hashlib.md5(self.user.email).hexdigest()
+
+User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
+
 
 
 class Follow(models.Model):
@@ -33,6 +36,9 @@ class Likes(models.Model):
     dwitte = models.ForeignKey(Dweet)
     likes = models.ForeignKey(User)
     creation_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("dwitte", "likes")
 
 
 class Comments(models.Model):
