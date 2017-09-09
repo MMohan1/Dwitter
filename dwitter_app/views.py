@@ -5,11 +5,12 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from dwitter_app.forms import AuthenticateForm, UserCreateForm, DwitterForm
-from dwitter_app.models import Dwitter, DwitterLike, DwitterComment
+from dwitter_app.models import Dweet, Likes, Comments, Follow
 from django.conf import settings
 from django.db.models import Count
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 
 
 def index(request, auth_form=None, user_form=None, dwitter_form=None):
@@ -21,17 +22,18 @@ def index(request, auth_form=None, user_form=None, dwitter_form=None):
         dwitter_form = dwitter_form or DwitterForm()
         user = request.user
         query_string = request.GET.get("q")
+        following_users = Follow.objects.filter(follower=request.user).values_list('following', flat=True).distinct()
         if not query_string:
             query_string = request.POST.get("query")
             if query_string == "None":
                 query_string = None
         if query_string:
-            dwitters_self = Dwitter.objects.filter(user=user.id, content__icontains=query_string)
-            dwitters_buddies = Dwitter.objects.filter(
-                user__userprofile__in=user.profile.follows.all(), content__icontains=query_string)
+            dwitters_self = Dweet.objects.filter(user=user.id, content__icontains=query_string)
+            dwitters_buddies = Dweet.objects.filter(
+                user__in=following_users, content__icontains=query_string)
         else:
-            dwitters_self = Dwitter.objects.filter(user=user.id)
-            dwitters_buddies = Dwitter.objects.filter(user__userprofile__in=user.profile.follows.all())
+            dwitters_self = Dweet.objects.filter(user=user.id)
+            dwitters_buddies = Dweet.objects.filter(user__in=following_users)
         dwitters = dwitters_self | dwitters_buddies
         return render(request,
                       'buddies.html',
@@ -39,13 +41,12 @@ def index(request, auth_form=None, user_form=None, dwitter_form=None):
                        'dwitters': dwitters[::-1],
                        "query_string": query_string,
                        'next_url': '/', "STATIC_URL": settings.STATIC_URL})
-    else:
-        # User is not logged in
-        auth_form = auth_form or AuthenticateForm()
-        user_form = user_form or UserCreateForm()
-        return render(request,
-                      'home.html',
-                      {'auth_form': auth_form, 'user_form': user_form, "STATIC_URL": settings.STATIC_URL})
+    # User is not logged in
+    auth_form = auth_form or AuthenticateForm()
+    user_form = user_form or UserCreateForm()
+    return render(request,
+                  'home.html',
+                  {'auth_form': auth_form, 'user_form': user_form, "STATIC_URL": settings.STATIC_URL})
 
 
 def login_view(request):
@@ -84,8 +85,7 @@ def signup(request):
             user = authenticate(username=username, password=password)
             login(request, user)
             return redirect('/')
-        else:
-            return index(request, user_form=user_form)
+        return index(request, user_form=user_form)
     return redirect('/')
 
 
@@ -95,7 +95,7 @@ def public(request, dwitter_form=None):
     view is used to get the public dwitte
     """
     dwitter_form = dwitter_form or DwitterForm()
-    dwiters = Dwitter.objects.all()[::-1]
+    dwiters = Dweet.objects.all()[::-1]
     return render(request,
                   'public.html',
                   {'dwitter_form': dwitter_form, 'next_url': '/dwiters',
@@ -125,7 +125,7 @@ def get_latest(user):
     for a user get the lattest twitte details
     """
     try:
-        return user.dwitter_set.order_by('-id')[0]
+        return user.dweet_set.order_by('-id')[0]
     except IndexError:
         return ""
 
@@ -141,19 +141,20 @@ def users(request, username="", dwitter_form=None):
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             raise Http404
-        dwiters = Dwitter.objects.filter(user=user.id)
-        if username == request.user.username or request.user.profile.follows.filter(user__username=username):
+        dwiters = Dweet.objects.filter(user=user.id)
+        if username == request.user.username or user.following.filter(following=request.user):
             # Self Profile or buddies' profile
             return render(request, 'user.html', {'user': user, 'dwiters': dwiters, "STATIC_URL": settings.STATIC_URL})
         return render(request, 'user.html', {'user': user, 'dwiters': dwiters, 'follow': True, "STATIC_URL": settings.STATIC_URL})
     query_string = request.GET.get("q")
     if query_string:
-        users = User.objects.filter(username__icontains=query_string).annotate(dwiters_count=Count('dwitter'))
+        users = User.objects.filter(username__icontains=query_string).annotate(dwiters_count=Count('dweet'))
     else:
-        users = User.objects.all().annotate(dwiters_count=Count('dwitter'))
+        users = User.objects.all().annotate(dwiters_count=Count('dweet'))
     dwites = map(get_latest, users)
     obj = zip(users, dwites)
     dwitter_form = dwitter_form or DwitterForm()
+
     return render(request,
                   'profiles.html',
                   {'obj': obj, 'next_url': '/users/',
@@ -172,7 +173,7 @@ def follow(request):
         if follow_id:
             try:
                 user = User.objects.get(id=follow_id)
-                request.user.profile.follows.add(user.profile)
+                Follow(follower=request.user, following=user).save()
             except ObjectDoesNotExist:
                 return redirect('/users/')
     return redirect('/users/')
@@ -187,17 +188,16 @@ def like(request):
         dwitter_id = request.POST.get('dwitter_id', False)
         if dwitter_id:
             try:
-                dwitter = Dwitter.objects.get(id=dwitter_id)
-                if dwitter.dwitterlike_set.filter(likes=request.user):
-                    dwitter_form = DwitterForm()
-                    dwitter_form.errors["content"] = "Hey " + request.user.first_name + "You are all ready liked this dwitte"
-                    return index(request, dwitter_form=dwitter_form)
-                else:
-                    dl = DwitterLike(dwitte=dwitter)
-                    dl.save()
-                    dl.likes.add(request.user)
+                dwitter = Dweet.objects.get(id=dwitter_id)
+                dl = Likes(dwitte=dwitter, likes=request.user)
+                dl.save()
             except ObjectDoesNotExist:
                 return redirect('/')
+            except IntegrityError:
+                dwitter_form = DwitterForm()
+                dwitter_form.errors["content"] = "Hey " + \
+                    request.user.first_name + "You are all ready liked this dwitte"
+                return index(request, dwitter_form=dwitter_form)
     return index(request)
 
 
@@ -211,11 +211,10 @@ def comment(request):
         comment = request.POST.get('content', False)
         if dwitter_id:
             try:
-                dwitter = Dwitter.objects.get(id=dwitter_id)
-                dl = DwitterComment(dwitte=dwitter)
+                dwitter = Dweet.objects.get(id=dwitter_id)
+                dl = Comments(dwitte=dwitter, comment_by=request.user)
                 dl.comment = comment
                 dl.save()
-                dl.comment_by.add(request.user)
             except ObjectDoesNotExist:
                 return redirect('/')
     return index(request)

@@ -32,8 +32,8 @@
             @{{ user.username }}
             <p>
                 {{ user.dwiters_count}} Dwittes
-                <span class="spacing">{{ user.profile.followed_by.count }} Followers</span>
-                <span class="spacing">{{ user.profile.follows.count }} Following</span>
+                <span class="spacing">{{ user.following.count }} Followers</span>
+                <span class="spacing">{{ user.follower.count }} Following</span>
             </p>
             <p>{{ Dwite.content }}</p>
         </div>
