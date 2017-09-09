@@ -41,13 +41,13 @@
             <p>
                 {{ dwitter.content }}
             </p>
-            {% if dwitter.dwittercomment_set.all.count %}
+            {% if dwitter.comments_set.all.count %}
             <h1><b>Comments</b></h1>
             </br>
             {% endif%}
             <p>
-              {% for dwitter in dwitter.dwittercomment_set.all %}
-              {{ dwitter.comment_by.first.first_name }}@ - {{ dwitter.comment }}  
+              {% for dwitter in dwitter.comments_set.all %}
+              {{ dwitter.comment_by.first_name }}@ - {{ dwitter.comment }}  
               &nbsp;
               &nbsp;
               &nbsp;
@@ -74,12 +74,12 @@
                   <input type="hidden" value="{{ dwitter.user.id }}" name="user_id">
                   <input type="hidden" value="{{ dwitter.id }}" name="dwitter_id">
                   <input type="hidden" value="{{ query_string }}" name="query">
-                  <p><span>{{ dwitter.dwittercomment_set.all.count}} Comments</span>
+                  <p><span>{{ dwitter.comments_set.all.count}} Comments</span>
                     &nbsp;
                     &nbsp;
                     &nbsp;
                     &nbsp;
-                    <span>{{ dwitter.dwitterlike_set.all.count}} Liked</span>
+                    <span>{{ dwitter.likes_set.all.count}} Liked</span>
                     &nbsp;
                     &nbsp;
                     &nbsp;

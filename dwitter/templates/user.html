@@ -7,36 +7,38 @@
 
 {% block content %}
     <div class="userpanel right">
-      <h1><b>Followers ({{user.profile.followed_by.count}})</b></h1>
-      {% for user in user.profile.followed_by.all %}
-      {{user.first.username}}
+      <h1><b>Followers ({{user.following.count}})</b></h1>
+      {% for user in user.following.all %}
         <div class="dwitterWrapper">
-            <a href="/users/{{ user.user.username }}">
-                <img class="avatar" src="{{ user.user.profile.gravatar_url }}">
-                <span class="name">{{ user.user.first_name }}</span>
+            <a href="/users/{{ user.follower.username }}">
+              <img class="avatar" src="{{ user.follower.profile.gravatar_url }}">
+              &nbsp;
+                <span class="name">{{ user.follower.first_name }}</span>
             </a>
-            @{{ user.user.username }}
+            @{{ user.follower.username }}
             <p>
-                {{ user.user.dwitter_set.count}} Dwittes
-                <span class="spacing">{{ user.user.profile.followed_by.count }} Followers</span>
-                <span class="spacing">{{ user.user.profile.follows.count }} Following</span>
+
+                &nbsp;{{ user.follower.dweet_set.count}} Dwittes
+                <span class="spacing">{{ user.follower.following.count }} Followers</span>
+                <span class="spacing">{{ user.follower.follower.count }} Following</span>
             </p>
             <p>{{ Dwite.content }}</p>
         </div>
         {% endfor %}
-      <h1><b>Following ({{user.profile.follows.count}})</b></h1>
-        {% for user in user.profile.follows.all %}
+      <h1><b>Following ({{user.follower.count}})</b></h1>
+        {% for user in user.follower.all %}
       {{user.first.username}}
         <div class="dwitterWrapper">
-            <a href="/users/{{ user.user.username }}">
-                <img class="avatar" src="{{ user.user.profile.gravatar_url }}">
-                <span class="name">{{ user.user.first_name }}</span>
+            <a href="/users/{{ user.following.username }}">
+              <img class="avatar" src="{{ user.following.profile.gravatar_url }}">
+              &nbsp;
+                <span class="name">{{ user.following.first_name }}</span>
             </a>
-            @{{ user.user.username }}
+            @{{ user.following.username }}
             <p>
-                {{ user.user.dwitter_set.count}} Dwittes
-                <span class="spacing">{{ user.user.profile.followed_by.count }} Followers</span>
-                <span class="spacing">{{ user.user.profile.follows.count }} Following</span>
+                &nbsp;{{ user.following.dweet_set.count}} Dwittes
+                <span class="spacing">{{ user.following.following.count }} Followers</span>
+                <span class="spacing">{{ user.following.follower.count }} Following</span>
             </p>
             <p>{{ Dwite.content }}</p>
         </div>
@@ -53,8 +55,8 @@
                 @{{ user.username }}
             <p>
                 {{ dwiters.count }} Dwittes
-                <span class="spacing">{{ user.profile.follows.all.count }} Following</span>
-                <span class="spacing">{{ user.profile.followed_by.all.count }} Followers</span>
+                <span class="spacing">{{ user.follower.count }} Following</span>
+                <span class="spacing">{{ user.following.count }} Followers</span>
             </p>
             {% if follow %}
             <form action="/follow" method="post">
@@ -77,9 +79,9 @@
             @{{ dwite.user.username }}
             <span class="time">{{ dwite.creation_date|timesince }}</span>
             <p>{{ dwite.content }}</p>
-            <p><span>{{ dwite.dwittercomment_set.all.count}} Comments</span>
+            <p><span>{{ dwite.comments_set.all.count}} Comments</span>
               &nbsp; &nbsp;&nbsp; &nbsp;
-              <span>{{ dwite.dwitterlike_set.all.count}} Liked</span>
+              <span>{{ dwite.likes_set.all.count}} Liked</span>
               
         </div>
         {% endfor %}
