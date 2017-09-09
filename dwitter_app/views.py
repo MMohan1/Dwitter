@@ -218,3 +218,11 @@ def comment(request):
             except ObjectDoesNotExist:
                 return redirect('/')
     return index(request)
+
+
+@login_required
+def activity(request):
+    """
+    """
+    tmp_str = "YET TO COME"
+    return render(request, "activity.html", {"tmp_str": tmp_str, "STATIC_URL": settings.STATIC_URL})
