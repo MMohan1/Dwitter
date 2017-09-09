@@ -6,6 +6,8 @@ from dwitter_app.models import Dweet
 
 
 class UserCreateForm(UserCreationForm):
+    """
+    """
     email = forms.EmailField(required=True, widget=forms.widgets.TextInput(attrs={'placeholder': 'Email'}))
     first_name = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={'placeholder': 'First Name'}))
     last_name = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={'placeholder': 'Last Name'}))
@@ -27,6 +29,8 @@ class UserCreateForm(UserCreationForm):
 
 
 class AuthenticateForm(AuthenticationForm):
+    """
+    """
     username = forms.CharField(widget=forms.widgets.TextInput(attrs={'placeholder': 'Username'}))
     password = forms.CharField(widget=forms.widgets.PasswordInput(attrs={'placeholder': 'Password'}))
 
@@ -39,6 +43,8 @@ class AuthenticateForm(AuthenticationForm):
 
 
 class DwitterForm(forms.ModelForm):
+    """
+    """
     content = forms.CharField(required=True, widget=forms.widgets.Textarea(attrs={'class': 'dwitterText'}))
 
     def is_valid(self):

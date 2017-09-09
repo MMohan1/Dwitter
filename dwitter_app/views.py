@@ -41,13 +41,12 @@ def index(request, auth_form=None, user_form=None, dwitter_form=None):
                        'dwitters': dwitters[::-1],
                        "query_string": query_string,
                        'next_url': '/', "STATIC_URL": settings.STATIC_URL})
-    else:
-        # User is not logged in
-        auth_form = auth_form or AuthenticateForm()
-        user_form = user_form or UserCreateForm()
-        return render(request,
-                      'home.html',
-                      {'auth_form': auth_form, 'user_form': user_form, "STATIC_URL": settings.STATIC_URL})
+    # User is not logged in
+    auth_form = auth_form or AuthenticateForm()
+    user_form = user_form or UserCreateForm()
+    return render(request,
+                  'home.html',
+                  {'auth_form': auth_form, 'user_form': user_form, "STATIC_URL": settings.STATIC_URL})
 
 
 def login_view(request):
@@ -86,8 +85,7 @@ def signup(request):
             user = authenticate(username=username, password=password)
             login(request, user)
             return redirect('/')
-        else:
-            return index(request, user_form=user_form)
+        return index(request, user_form=user_form)
     return redirect('/')
 
 
