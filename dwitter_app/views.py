@@ -30,11 +30,9 @@ def index(request, auth_form=None, user_form=None, dwitter_form=None):
                 query_string = None
         if query_string:
             dwitters = Dweet.objects.filter(
-                Q(user__in=following_users) | Q(user=user.id), content__icontains=query_string).annotate(num_likes=Count('likes'),
-                                                                                                         num_comments=Count("comments"))
+                Q(user__in=following_users) | Q(user=user.id), content__icontains=query_string).annotate(num_likes=Count('likes',distinct=True)).annotate(num_comments=Count("comments",distinct=True))
         else:
-            dwitters = Dweet.objects.filter(Q(user__in=following_users) | Q(user=user.id)).annotate(
-                num_likes=Count('likes'), num_comments=Count("comments"))
+            dwitters = Dweet.objects.filter(Q(user__in=following_users) | Q(user=user.id)).annotate(num_likes=Count('likes',distinct=True)).annotate(num_comments=Count("comments",distinct=True))
         return render(request,
                       'buddies.html',
                       {'dwitter_form': dwitter_form, 'user': user,
