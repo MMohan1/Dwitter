@@ -11,6 +11,7 @@ from django.db.models import Count
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+from django.db.models import Q
 
 
 def index(request, auth_form=None, user_form=None, dwitter_form=None):
@@ -28,13 +29,12 @@ def index(request, auth_form=None, user_form=None, dwitter_form=None):
             if query_string == "None":
                 query_string = None
         if query_string:
-            dwitters_self = Dweet.objects.filter(user=user.id, content__icontains=query_string)
-            dwitters_buddies = Dweet.objects.filter(
-                user__in=following_users, content__icontains=query_string)
+            dwitters = Dweet.objects.filter(
+                Q(user__in=following_users) | Q(user=user.id), content__icontains=query_string).annotate(num_likes=Count('likes'),
+                                                                                                         num_comments=Count("comments"))
         else:
-            dwitters_self = Dweet.objects.filter(user=user.id)
-            dwitters_buddies = Dweet.objects.filter(user__in=following_users)
-        dwitters = dwitters_self | dwitters_buddies
+            dwitters = Dweet.objects.filter(Q(user__in=following_users) | Q(user=user.id)).annotate(
+                num_likes=Count('likes'), num_comments=Count("comments"))
         return render(request,
                       'buddies.html',
                       {'dwitter_form': dwitter_form, 'user': user,

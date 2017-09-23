@@ -74,12 +74,12 @@
                   <input type="hidden" value="{{ dwitter.user.id }}" name="user_id">
                   <input type="hidden" value="{{ dwitter.id }}" name="dwitter_id">
                   <input type="hidden" value="{{ query_string }}" name="query">
-                  <p><span>{{ dwitter.comments_set.all.count}} Comments</span>
+                  <p><span>{{ dwitter.num_comments}} Comments</span>
                     &nbsp;
                     &nbsp;
                     &nbsp;
                     &nbsp;
-                    <span>{{ dwitter.likes_set.all.count}} Liked</span>
+                    <span>{{ dwitter.num_likes}} Liked</span>
                     &nbsp;
                     &nbsp;
                     &nbsp;
